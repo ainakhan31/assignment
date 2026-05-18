@@ -5,10 +5,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-// ─────────────────────────────────────────────
-//  CUSTOM EXCEPTION CLASSES
-// ─────────────────────────────────────────────
-
 class EmptyFieldException extends Exception {
     public EmptyFieldException(String fieldName) {
         super("Field cannot be empty: " + fieldName);
