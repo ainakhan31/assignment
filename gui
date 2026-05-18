@@ -1,0 +1,565 @@
+import javax.swing.*;
+import javax.swing.border.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+/**
+ * Library Book Issue System
+ * Course: Software Design and Architecture
+ * Demonstrates: GUI Components + ActionListener (Backend)
+ */
+public class LibraryBookIssueSystem extends JFrame implements ActionListener {
+
+    // ─────────────────────────────────────────────
+    //  GUI COMPONENTS (Fields declared at class level
+    //  so ActionListeners can access them)
+    // ─────────────────────────────────────────────
+
+    // Input Fields
+    private JTextField txtStudentName;
+    private JTextField txtRollNumber;
+    private JTextField txtBookTitle;
+    private JTextField txtIssueDate;
+    private JTextField txtReturnDate;
+    private JTextArea  txtRemarks;
+
+    // Dropdown
+    private JComboBox<String> cmbCategory;
+
+    // Radio Buttons
+    private JRadioButton rbNew;
+    private JRadioButton rbOld;
+    private ButtonGroup  bgEdition;
+
+    // Buttons
+    private JButton btnIssue;
+    private JButton btnReset;
+    private JButton btnExit;
+
+    // Status Label
+    private JLabel lblStatus;
+
+    // ─────────────────────────────────────────────
+    //  COLOR PALETTE  (Dark Library / Emerald theme)
+    // ─────────────────────────────────────────────
+    private static final Color BG_DARK      = new Color(18,  24,  38);
+    private static final Color BG_CARD      = new Color(26,  34,  52);
+    private static final Color BG_INPUT     = new Color(34,  44,  66);
+    private static final Color ACCENT       = new Color(52, 199, 123);   // emerald
+    private static final Color ACCENT_HOVER = new Color(38, 160,  96);
+    private static final Color TEXT_PRIMARY  = new Color(230, 235, 245);
+    private static final Color TEXT_MUTED    = new Color(130, 145, 175);
+    private static final Color BORDER_COLOR = new Color(48,  62,  90);
+    private static final Color BTN_RESET    = new Color(59,  79, 120);
+    private static final Color BTN_EXIT     = new Color(180,  55,  55);
+
+    // ─────────────────────────────────────────────
+    //  CONSTRUCTOR
+    // ─────────────────────────────────────────────
+    public LibraryBookIssueSystem() {
+        setTitle("Library Book Issue System");
+        setSize(720, 780);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setResizable(false);
+
+        buildUI();
+        setVisible(true);
+    }
+
+    // ─────────────────────────────────────────────
+    //  BUILD UI
+    // ─────────────────────────────────────────────
+    private void buildUI() {
+
+        // ── Root Panel ──────────────────────────
+        JPanel root = new JPanel(new BorderLayout());
+        root.setBackground(BG_DARK);
+        root.setBorder(new EmptyBorder(20, 25, 20, 25));
+        setContentPane(root);
+
+        // ── Header ──────────────────────────────
+        root.add(buildHeader(), BorderLayout.NORTH);
+
+        // ── Form Card ───────────────────────────
+        JPanel formCard = buildFormCard();
+        root.add(formCard, BorderLayout.CENTER);
+
+        // ── Footer Buttons ──────────────────────
+        root.add(buildFooter(), BorderLayout.SOUTH);
+    }
+
+    // ── HEADER ──────────────────────────────────
+    private JPanel buildHeader() {
+        JPanel header = new JPanel();
+        header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
+        header.setBackground(BG_DARK);
+        header.setBorder(new EmptyBorder(0, 0, 18, 0));
+
+        // Icon row
+        JLabel icon = new JLabel("📚", SwingConstants.CENTER);
+        icon.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 38));
+        icon.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel title = new JLabel("LIBRARY BOOK ISSUE SYSTEM");
+        title.setFont(new Font("Trebuchet MS", Font.BOLD, 22));
+        title.setForeground(ACCENT);
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel subtitle = new JLabel("University Central Library  •  Student Book Issuance Portal");
+        subtitle.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        subtitle.setForeground(TEXT_MUTED);
+        subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Divider
+        JSeparator sep = new JSeparator();
+        sep.setForeground(BORDER_COLOR);
+        sep.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+
+        header.add(icon);
+        header.add(Box.createVerticalStrut(4));
+        header.add(title);
+        header.add(Box.createVerticalStrut(4));
+        header.add(subtitle);
+        header.add(Box.createVerticalStrut(14));
+        header.add(sep);
+
+        return header;
+    }
+
+    // ── FORM CARD ────────────────────────────────
+    private JPanel buildFormCard() {
+        JPanel card = new JPanel(new GridBagLayout());
+        card.setBackground(BG_CARD);
+        card.setBorder(BorderFactory.createCompoundBorder(
+            new LineBorder(BORDER_COLOR, 1, true),
+            new EmptyBorder(22, 28, 22, 28)
+        ));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill    = GridBagConstraints.HORIZONTAL;
+        gbc.insets  = new Insets(7, 5, 7, 5);
+
+        // ── Section: Student Info ────────────────
+        addSectionHeader(card, gbc, 0, "👤  Student Information");
+
+        // Student Name
+        addLabel(card, gbc, 1, 0, "Student Name");
+        txtStudentName = createTextField("Enter full name");
+        addField(card, gbc, 1, 1, txtStudentName);
+
+        // Roll Number
+        addLabel(card, gbc, 2, 0, "Roll Number");
+        txtRollNumber = createTextField("e.g.  BSCS-F22-001");
+        addField(card, gbc, 2, 1, txtRollNumber);
+
+        // ── Section: Book Details ────────────────
+        addSectionHeader(card, gbc, 3, "📖  Book Details");
+
+        // Book Title
+        addLabel(card, gbc, 4, 0, "Book Title");
+        txtBookTitle = createTextField("Enter book title");
+        addField(card, gbc, 4, 1, txtBookTitle);
+
+        // Book Category (JComboBox)
+        addLabel(card, gbc, 5, 0, "Book Category");
+        String[] categories = {
+            "-- Select Category --",
+            "Programming",
+            "Artificial Intelligence",
+            "Databases",
+            "Networking",
+            "Software Engineering",
+            "Data Structures",
+            "Operating Systems",
+            "Cybersecurity"
+        };
+        cmbCategory = new JComboBox<>(categories);
+        styleComboBox(cmbCategory);
+        addField(card, gbc, 5, 1, cmbCategory);
+
+        // Book Edition (Radio Buttons)
+        addLabel(card, gbc, 6, 0, "Book Edition");
+        JPanel radioPanel = buildRadioPanel();
+        addField(card, gbc, 6, 1, radioPanel);
+
+        // ── Section: Issue Dates ─────────────────
+        addSectionHeader(card, gbc, 7, "📅  Issue & Return Dates");
+
+        // Issue Date
+        addLabel(card, gbc, 8, 0, "Issue Date");
+        txtIssueDate = createTextField("");
+        txtIssueDate.setText(LocalDate.now()
+            .format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+        txtIssueDate.setEditable(false);
+        txtIssueDate.setForeground(ACCENT);
+        addField(card, gbc, 8, 1, txtIssueDate);
+
+        // Return Date
+        addLabel(card, gbc, 9, 0, "Return Date");
+        txtReturnDate = createTextField("");
+        txtReturnDate.setText(LocalDate.now().plusDays(14)
+            .format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+        txtReturnDate.setEditable(false);
+        txtReturnDate.setForeground(new Color(255, 190, 80));
+        addField(card, gbc, 9, 1, txtReturnDate);
+
+        // ── Remarks (TextArea) ───────────────────
+        addSectionHeader(card, gbc, 10, "💬  Remarks  (Optional)");
+
+        addLabel(card, gbc, 11, 0, "Remarks");
+        txtRemarks = new JTextArea(3, 20);
+        txtRemarks.setBackground(BG_INPUT);
+        txtRemarks.setForeground(TEXT_PRIMARY);
+        txtRemarks.setCaretColor(ACCENT);
+        txtRemarks.setBorder(new EmptyBorder(8, 10, 8, 10));
+        txtRemarks.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        txtRemarks.setLineWrap(true);
+        txtRemarks.setWrapStyleWord(true);
+        JScrollPane scrollRemarks = new JScrollPane(txtRemarks);
+        scrollRemarks.setBorder(new LineBorder(BORDER_COLOR, 1));
+        scrollRemarks.setBackground(BG_INPUT);
+        gbc.gridx = 1; gbc.gridy = 11;
+        card.add(scrollRemarks, gbc);
+
+        // ── Status Label ─────────────────────────
+        lblStatus = new JLabel(" ");
+        lblStatus.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        lblStatus.setForeground(ACCENT);
+        lblStatus.setHorizontalAlignment(SwingConstants.CENTER);
+        gbc.gridx = 0; gbc.gridy = 12;
+        gbc.gridwidth = 2;
+        gbc.insets = new Insets(12, 5, 0, 5);
+        card.add(lblStatus, gbc);
+        gbc.gridwidth = 1;
+
+        return card;
+    }
+
+    // ── RADIO PANEL ─────────────────────────────
+    private JPanel buildRadioPanel() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        panel.setBackground(BG_CARD);
+
+        rbNew = new JRadioButton("New Edition");
+        rbOld = new JRadioButton("Old Edition");
+        rbNew.setSelected(true);
+
+        styleRadioButton(rbNew);
+        styleRadioButton(rbOld);
+
+        bgEdition = new ButtonGroup();
+        bgEdition.add(rbNew);
+        bgEdition.add(rbOld);
+
+        panel.add(rbNew);
+        panel.add(Box.createHorizontalStrut(18));
+        panel.add(rbOld);
+
+        return panel;
+    }
+
+    // ── FOOTER BUTTONS ───────────────────────────
+    private JPanel buildFooter() {
+        JPanel footer = new JPanel(new FlowLayout(FlowLayout.CENTER, 14, 0));
+        footer.setBackground(BG_DARK);
+        footer.setBorder(new EmptyBorder(18, 0, 4, 0));
+
+        btnIssue = createButton("✔  Issue Book", ACCENT,       BG_DARK);
+        btnReset = createButton("↺  Reset",      BTN_RESET,    BG_DARK);
+        btnExit  = createButton("✕  Exit",       BTN_EXIT,     BG_DARK);
+
+        // Register ActionListeners — ALL go through actionPerformed()
+        btnIssue.addActionListener(this);
+        btnReset.addActionListener(this);
+        btnExit.addActionListener(this);
+
+        footer.add(btnIssue);
+        footer.add(btnReset);
+        footer.add(btnExit);
+
+        return footer;
+    }
+
+    // ─────────────────────────────────────────────
+    //  ACTION LISTENER  (Backend Logic)
+    // ─────────────────────────────────────────────
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+        Object source = e.getSource();
+
+        // ── ISSUE BOOK ───────────────────────────
+        if (source == btnIssue) {
+            handleIssueBook();
+        }
+
+        // ── RESET ────────────────────────────────
+        else if (source == btnReset) {
+            handleReset();
+        }
+
+        // ── EXIT ─────────────────────────────────
+        else if (source == btnExit) {
+            handleExit();
+        }
+    }
+
+    // ── ISSUE BOOK HANDLER ───────────────────────
+    private void handleIssueBook() {
+
+        // 1. Read all input values
+        String name     = txtStudentName.getText().trim();
+        String roll     = txtRollNumber.getText().trim();
+        String title    = txtBookTitle.getText().trim();
+        String category = (String) cmbCategory.getSelectedItem();
+        String edition  = rbNew.isSelected() ? "New Edition" : "Old Edition";
+        String issue    = txtIssueDate.getText().trim();
+        String ret      = txtReturnDate.getText().trim();
+        String remarks  = txtRemarks.getText().trim();
+
+        // 2. Validate inputs
+        if (name.isEmpty()) {
+            showError("❌  Student name cannot be empty.");
+            txtStudentName.requestFocus();
+            return;
+        }
+        if (roll.isEmpty()) {
+            showError("❌  Roll number cannot be empty.");
+            txtRollNumber.requestFocus();
+            return;
+        }
+        if (title.isEmpty()) {
+            showError("❌  Book title cannot be empty.");
+            txtBookTitle.requestFocus();
+            return;
+        }
+        if (category.startsWith("--")) {
+            showError("❌  Please select a book category.");
+            return;
+        }
+
+        // 3. Build confirmation message
+        String message =
+            "╔══════════════════════════════╗\n" +
+            "     BOOK ISSUE CONFIRMATION     \n" +
+            "╚══════════════════════════════╝\n\n" +
+            "  Student Name  :  " + name       + "\n" +
+            "  Roll Number   :  " + roll       + "\n" +
+            "  Book Title    :  " + title      + "\n" +
+            "  Category      :  " + category   + "\n" +
+            "  Edition       :  " + edition    + "\n" +
+            "  Issue Date    :  " + issue      + "\n" +
+            "  Return Date   :  " + ret        + "\n" +
+            (remarks.isEmpty() ? "" :
+            "  Remarks       :  " + remarks    + "\n") +
+            "\n  Return book by: " + ret;
+
+        // 4. Show confirmation dialog
+        int confirm = JOptionPane.showConfirmDialog(
+            this,
+            message,
+            "Confirm Book Issue",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.INFORMATION_MESSAGE
+        );
+
+        // 5. Process result
+        if (confirm == JOptionPane.YES_OPTION) {
+            lblStatus.setText("✅  Book issued successfully to " + name + "  |  Return by: " + ret);
+            lblStatus.setForeground(ACCENT);
+
+            // In a real system: save to DB here
+            System.out.println("[LOG] Book issued → " + name + " | " + title + " | " + ret);
+        } else {
+            lblStatus.setText("⚠  Issue cancelled.");
+            lblStatus.setForeground(new Color(255, 190, 80));
+        }
+    }
+
+    // ── RESET HANDLER ────────────────────────────
+    private void handleReset() {
+        int confirm = JOptionPane.showConfirmDialog(
+            this,
+            "Are you sure you want to clear all fields?",
+            "Reset Form",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            txtStudentName.setText("");
+            txtRollNumber.setText("");
+            txtBookTitle.setText("");
+            cmbCategory.setSelectedIndex(0);
+            rbNew.setSelected(true);
+            txtRemarks.setText("");
+
+            // Restore auto dates
+            txtIssueDate.setText(LocalDate.now()
+                .format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+            txtReturnDate.setText(LocalDate.now().plusDays(14)
+                .format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+
+            lblStatus.setText("🔄  Form has been reset.");
+            lblStatus.setForeground(TEXT_MUTED);
+
+            txtStudentName.requestFocus();
+        }
+    }
+
+    // ── EXIT HANDLER ─────────────────────────────
+    private void handleExit() {
+        int confirm = JOptionPane.showConfirmDialog(
+            this,
+            "Are you sure you want to exit the system?",
+            "Exit",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            System.exit(0);
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    //  HELPER: show error in status label
+    // ─────────────────────────────────────────────
+    private void showError(String msg) {
+        lblStatus.setText(msg);
+        lblStatus.setForeground(new Color(230, 80, 80));
+    }
+
+    // ─────────────────────────────────────────────
+    //  UI HELPER METHODS
+    // ─────────────────────────────────────────────
+
+    private JTextField createTextField(String placeholder) {
+        JTextField field = new JTextField();
+        field.setBackground(BG_INPUT);
+        field.setForeground(TEXT_PRIMARY);
+        field.setCaretColor(ACCENT);
+        field.setBorder(BorderFactory.createCompoundBorder(
+            new LineBorder(BORDER_COLOR, 1),
+            new EmptyBorder(7, 10, 7, 10)
+        ));
+        field.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+
+        // Placeholder text behaviour
+        if (!placeholder.isEmpty()) {
+            field.setText(placeholder);
+            field.setForeground(TEXT_MUTED);
+            field.addFocusListener(new FocusAdapter() {
+                @Override public void focusGained(FocusEvent e) {
+                    if (field.getText().equals(placeholder)) {
+                        field.setText("");
+                        field.setForeground(TEXT_PRIMARY);
+                    }
+                }
+                @Override public void focusLost(FocusEvent e) {
+                    if (field.getText().isEmpty()) {
+                        field.setText(placeholder);
+                        field.setForeground(TEXT_MUTED);
+                    }
+                }
+            });
+        }
+        return field;
+    }
+
+    private void styleComboBox(JComboBox<String> cmb) {
+        cmb.setBackground(BG_INPUT);
+        cmb.setForeground(TEXT_PRIMARY);
+        cmb.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        cmb.setBorder(new LineBorder(BORDER_COLOR, 1));
+    }
+
+    private void styleRadioButton(JRadioButton rb) {
+        rb.setBackground(BG_CARD);
+        rb.setForeground(TEXT_PRIMARY);
+        rb.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        rb.setFocusPainted(false);
+    }
+
+    private JButton createButton(String text, Color bg, Color fg) {
+        JButton btn = new JButton(text) {
+            @Override protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                                    RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getBackground());
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        btn.setBackground(bg);
+        btn.setForeground(Color.WHITE);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btn.setPreferredSize(new Dimension(148, 40));
+        btn.setFocusPainted(false);
+        btn.setBorderPainted(false);
+        btn.setContentAreaFilled(false);
+        btn.setOpaque(false);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        // Hover effect
+        btn.addMouseListener(new MouseAdapter() {
+            @Override public void mouseEntered(MouseEvent e) {
+                btn.setBackground(bg.darker());
+            }
+            @Override public void mouseExited(MouseEvent e) {
+                btn.setBackground(bg);
+            }
+        });
+        return btn;
+    }
+
+    // ── GridBag helpers ──────────────────────────
+    private void addLabel(JPanel p, GridBagConstraints g,
+                          int row, int col, String text) {
+        JLabel lbl = new JLabel(text + " :");
+        lbl.setForeground(TEXT_MUTED);
+        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        g.gridx = col; g.gridy = row;
+        g.weightx = 0.28;
+        g.insets = new Insets(6, 5, 6, 10);
+        p.add(lbl, g);
+    }
+
+    private void addField(JPanel p, GridBagConstraints g,
+                          int row, int col, Component comp) {
+        g.gridx = col; g.gridy = row;
+        g.weightx = 0.72;
+        g.insets = new Insets(6, 0, 6, 5);
+        p.add(comp, g);
+    }
+
+    private void addSectionHeader(JPanel p, GridBagConstraints g,
+                                   int row, String text) {
+        JLabel lbl = new JLabel(text);
+        lbl.setForeground(ACCENT);
+        lbl.setFont(new Font("Trebuchet MS", Font.BOLD, 13));
+        lbl.setBorder(new MatteBorder(0, 0, 1, 0, BORDER_COLOR));
+        g.gridx = 0; g.gridy = row;
+        g.gridwidth = 2;
+        g.insets = new Insets(14, 5, 4, 5);
+        p.add(lbl, g);
+        g.gridwidth = 1;
+    }
+
+    // ─────────────────────────────────────────────
+    //  MAIN
+    // ─────────────────────────────────────────────
+    public static void main(String[] args) {
+        // Use system look-and-feel as base, then override
+        try {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        } catch (Exception ignored) {}
+
+        SwingUtilities.invokeLater(LibraryBookIssueSystem::new);
+    }
+}
