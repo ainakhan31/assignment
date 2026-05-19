@@ -202,7 +202,6 @@ class LibraryBookIssueSystem extends JFrame implements ActionListener {
 
             try {
 
-                int dummy = Integer.parseInt("0");
             } catch (NumberFormatException nfe) {
                 throw new NumberFormatException("Book ID must be a number. " + nfe.getMessage());
             }
