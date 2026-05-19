@@ -29,10 +29,6 @@ class NullSelectionException extends Exception {
     }
 }
 
-// ─────────────────────────────────────────────
-//  MAIN CLASS
-// ─────────────────────────────────────────────
-
 class LibraryBookIssueSystem extends JFrame implements ActionListener {
 
     JTextField txtName, txtRoll, txtBookTitle, txtIssueDate, txtReturnDate;
@@ -52,28 +48,23 @@ class LibraryBookIssueSystem extends JFrame implements ActionListener {
 
         ((JPanel) getContentPane()).setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        // Student Name
         add(new JLabel("Student Name:"));
         txtName = new JTextField();
         add(txtName);
 
-        // Roll Number
         add(new JLabel("Roll Number:"));
         txtRoll = new JTextField();
         add(txtRoll);
 
-        // Book Title
         add(new JLabel("Book Title:"));
         txtBookTitle = new JTextField();
         add(txtBookTitle);
 
-        // Book Category
         add(new JLabel("Book Category:"));
         String[] categories = { "Select", "Programming", "AI", "Databases", "Networking" };
         cmbCategory = new JComboBox<>(categories);
         add(cmbCategory);
 
-        // Book Edition (Radio Buttons)
         add(new JLabel("Book Edition:"));
         JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         rbNew = new JRadioButton("New", true);
@@ -85,25 +76,21 @@ class LibraryBookIssueSystem extends JFrame implements ActionListener {
         radioPanel.add(rbOld);
         add(radioPanel);
 
-        // Issue Date
         add(new JLabel("Issue Date (dd-MM-yyyy):"));
         txtIssueDate = new JTextField();
         add(txtIssueDate);
 
-        // Return Date
         add(new JLabel("Return Date (dd-MM-yyyy):"));
         txtReturnDate = new JTextField();
         add(txtReturnDate);
 
-        // Remarks
         add(new JLabel("Remarks:"));
         txtRemarks = new JTextArea(2, 20);
         add(new JScrollPane(txtRemarks));
 
-        // Buttons
         btnIssue = new JButton("Issue Book");
         btnReset = new JButton("Reset");
-        btnExit  = new JButton("Exit");
+        btnExit = new JButton("Exit");
 
         btnIssue.addActionListener(this);
         btnReset.addActionListener(this);
@@ -117,45 +104,35 @@ class LibraryBookIssueSystem extends JFrame implements ActionListener {
         setVisible(true);
     }
 
-    // ─────────────────────────────────────────────
-    //  VALIDATION METHODS  (each throws its exception)
-    // ─────────────────────────────────────────────
-
-    // Throws EmptyFieldException if value is blank
     private void checkEmpty(String value, String fieldName) throws EmptyFieldException {
         if (value == null || value.trim().isEmpty()) {
             throw new EmptyFieldException(fieldName);
         }
     }
 
-    // Throws InvalidRollNumberException if format is wrong
-    // Expected format: letters-letters+digits-digits  e.g. BSCS-F22-001
     private void validateRollNumber(String roll) throws InvalidRollNumberException {
         if (!roll.matches("[A-Za-z]+-[A-Za-z0-9]+-[0-9]+")) {
             throw new InvalidRollNumberException(roll);
         }
     }
 
-    // Throws NullSelectionException if default "Select" is still chosen
     private void checkCategorySelection(String category) throws NullSelectionException {
         if (category == null || category.equals("Select")) {
             throw new NullSelectionException("Book Category");
         }
     }
 
-    // Throws NullSelectionException if no radio button is selected
     private void checkEditionSelection() throws NullSelectionException {
         if (!rbNew.isSelected() && !rbOld.isSelected()) {
             throw new NullSelectionException("Book Edition");
         }
     }
 
-    // Throws InvalidDateException if dates are malformed or return < issue
     private void validateDates(String issueDateStr, String returnDateStr)
             throws InvalidDateException {
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        sdf.setLenient(false); // strict parsing — rejects invalid dates like 31-02-2025
+        sdf.setLenient(false);
 
         Date issueDate;
         Date returnDate;
@@ -182,10 +159,6 @@ class LibraryBookIssueSystem extends JFrame implements ActionListener {
         }
     }
 
-    // ─────────────────────────────────────────────
-    //  ACTION LISTENER
-    // ─────────────────────────────────────────────
-
     @Override
     public void actionPerformed(ActionEvent e) {
 
@@ -200,65 +173,48 @@ class LibraryBookIssueSystem extends JFrame implements ActionListener {
         }
     }
 
-    // ─────────────────────────────────────────────
-    //  ISSUE BOOK  —  try / catch / throw / finally
-    // ─────────────────────────────────────────────
-
     private void handleIssueBook() {
 
         boolean success = false;
 
         try {
 
-            // Read all values
-            String name      = txtName.getText().trim();
-            String roll      = txtRoll.getText().trim();
-            String title     = txtBookTitle.getText().trim();
-            String category  = (String) cmbCategory.getSelectedItem();
+            String name = txtName.getText().trim();
+            String roll = txtRoll.getText().trim();
+            String title = txtBookTitle.getText().trim();
+            String category = (String) cmbCategory.getSelectedItem();
             String issueDate = txtIssueDate.getText().trim();
-            String retDate   = txtReturnDate.getText().trim();
+            String retDate = txtReturnDate.getText().trim();
 
-            // 1. Empty field checks  →  throws EmptyFieldException
-            checkEmpty(name,      "Student Name");
-            checkEmpty(roll,      "Roll Number");
-            checkEmpty(title,     "Book Title");
+            checkEmpty(name, "Student Name");
+            checkEmpty(roll, "Roll Number");
+            checkEmpty(title, "Book Title");
             checkEmpty(issueDate, "Issue Date");
-            checkEmpty(retDate,   "Return Date");
+            checkEmpty(retDate, "Return Date");
 
-            // 2. Roll number format  →  throws InvalidRollNumberException
             validateRollNumber(roll);
 
-            // 3. Category selection  →  throws NullSelectionException
             checkCategorySelection(category);
 
-            // 4. Edition selection   →  throws NullSelectionException
             checkEditionSelection();
 
-            // 5. Date validation     →  throws InvalidDateException
             validateDates(issueDate, retDate);
 
-            // 6. NumberFormatException example:
-            //    If we ever parse a numeric field (e.g. book ID), wrap it here.
-            //    Kept as a demonstration block.
             try {
-                // txtBookTitle is text, but imagine a numeric ID field:
-                // int id = Integer.parseInt(someNumericField);
-                // For demonstration, this won't throw in normal usage.
-                int dummy = Integer.parseInt("0"); // safe value
+
+                int dummy = Integer.parseInt("0");
             } catch (NumberFormatException nfe) {
                 throw new NumberFormatException("Book ID must be a number. " + nfe.getMessage());
             }
 
-            // All validations passed — build summary
             String edition = rbNew.isSelected() ? "New Edition" : "Old Edition";
-            String summary =
-                    "Name     : " + name      + "\n" +
-                            "Roll No  : " + roll      + "\n" +
-                            "Book     : " + title     + "\n" +
-                            "Category : " + category  + "\n" +
-                            "Edition  : " + edition   + "\n" +
-                            "Issued   : " + issueDate + "\n" +
-                            "Return   : " + retDate;
+            String summary = "Name     : " + name + "\n" +
+                    "Roll No  : " + roll + "\n" +
+                    "Book     : " + title + "\n" +
+                    "Category : " + category + "\n" +
+                    "Edition  : " + edition + "\n" +
+                    "Issued   : " + issueDate + "\n" +
+                    "Return   : " + retDate;
 
             JOptionPane.showMessageDialog(this, summary,
                     "Book Issued Successfully", JOptionPane.INFORMATION_MESSAGE);
@@ -291,23 +247,13 @@ class LibraryBookIssueSystem extends JFrame implements ActionListener {
                     "Validation Error", JOptionPane.WARNING_MESSAGE);
 
         } catch (Exception ex) {
-            // Catch-all for any unexpected exception
+
             JOptionPane.showMessageDialog(this,
                     "Unexpected Error:\n" + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
 
-        } finally {
-            // finally block always runs — whether exception occurred or not
-            String status = success ? "Book issue operation completed successfully."
-                    : "Operation completed with errors. Please review.";
-            JOptionPane.showMessageDialog(this, status,
-                    "Operation Completed", JOptionPane.INFORMATION_MESSAGE);
         }
     }
-
-    // ─────────────────────────────────────────────
-    //  RESET
-    // ─────────────────────────────────────────────
 
     private void handleReset() {
         try {
@@ -325,16 +271,8 @@ class LibraryBookIssueSystem extends JFrame implements ActionListener {
                     "Error while resetting form:\n" + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
 
-        } finally {
-            JOptionPane.showMessageDialog(this,
-                    "Form has been reset.", "Operation Completed",
-                    JOptionPane.INFORMATION_MESSAGE);
         }
     }
-
-    // ─────────────────────────────────────────────
-    //  EXIT
-    // ─────────────────────────────────────────────
 
     private void handleExit() {
         try {
@@ -347,9 +285,6 @@ class LibraryBookIssueSystem extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this,
                     "Error while exiting:\n" + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
-        } finally {
-            // Only reaches here if user said No (exit was cancelled)
-            System.out.println("Exit operation handled.");
         }
     }
 
