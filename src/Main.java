@@ -252,6 +252,12 @@ class LibraryBookIssueSystem extends JFrame implements ActionListener {
                     "Unexpected Error:\n" + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
 
+        } finally {
+
+            String status = success ? "Book issue operation completed successfully."
+                    : "Operation completed with errors. Please review.";
+            JOptionPane.showMessageDialog(this, status,
+                    "Operation Completed", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -271,6 +277,10 @@ class LibraryBookIssueSystem extends JFrame implements ActionListener {
                     "Error while resetting form:\n" + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
 
+        } finally {
+            JOptionPane.showMessageDialog(this,
+                    "Form has been reset.", "Operation Completed",
+                    JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
@@ -285,6 +295,9 @@ class LibraryBookIssueSystem extends JFrame implements ActionListener {
             JOptionPane.showMessageDialog(this,
                     "Error while exiting:\n" + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+
+            System.out.println("Exit operation handled.");
         }
     }
 
